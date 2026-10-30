@@ -104,8 +104,5 @@ The application uses port:
 
 ## Notes
 
-This is a beginner-friendly networking project designed to illustrate basic TCP socket communication in C. It is useful for learning how sockets, TCP streams, and echo-based communication behave in practice.
+This is a beginner-friendly networking project I build to learn basic TCP socket communication in C. It is useful for learning how sockets, TCP streams, and echo-based communication behave in practice.
 
-## License
-
-This project is provided for educational purposes.
