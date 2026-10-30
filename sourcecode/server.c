@@ -17,12 +17,12 @@ int main(void) {
     // AF_INET     : IPv4 Internet protocols
     // SOCK_STREAM : Sequenced, reliable, two-way connection (TCP)
     // 0           : Automatically choose default protocol (IPPROTO_TCP)
-    int ipv4_tcp = socket(AF_INET, SOCK_STREAM, 0);
-    if (ipv4_tcp == -1) {
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1) {
         perror("socket failed");
         exit(EXIT_FAILURE);
     } else {
-        printf("Socket created successfully! FD: %d\n", ipv4_tcp);
+        printf("Socket created successfully! FD: %d\n", server_fd);
     }
 
     // -------------------------------------------------------------
@@ -39,9 +39,9 @@ int main(void) {
     // 3. Bind the socket to the configured IP address and port
     // -------------------------------------------------------------
     // Cast (struct sockaddr_in *) to the generic (struct sockaddr *) required by POSIX
-    if (bind(ipv4_tcp, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+    if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
         perror("error while binding network address!");
-        close(ipv4_tcp); // Release socket descriptor before exiting
+        close(server_fd); // Release socket descriptor before exiting
         exit(EXIT_FAILURE);
     } else {
         printf("Socket successfully bound to port\n");
@@ -51,9 +51,9 @@ int main(void) {
     // 4. Mark the socket as passive (ready to accept incoming connections)
     // -------------------------------------------------------------
     // Backlog (5): Maximum length of pending connections queue in kernel
-    if (listen(ipv4_tcp, 5) == -1) {
+    if (listen(server_fd, 5) == -1) {
         perror("error while attempting to listen!");
-        close(ipv4_tcp);
+        close(server_fd);
         exit(EXIT_FAILURE);     
     }
 
@@ -68,11 +68,11 @@ int main(void) {
 
     // Blocks execution until a client completes the TCP 3-way handshake.
     // Returns a brand-new descriptor (client_fd) dedicated to this connection;
-    // ipv4_tcp remains open and listening for other connections.
-    int client_fd = accept(ipv4_tcp, (struct sockaddr *)&client_addr, &client_len);
+    // server_fd remains open and listening for other connections.
+    int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
     if (client_fd < 0) {
         perror("error while accepting client connection!");
-        close(ipv4_tcp);
+        close(server_fd);
         exit(EXIT_FAILURE);     
     } else {
         // Convert binary network address to human-readable IPv4 string
@@ -114,6 +114,6 @@ int main(void) {
     // -------------------------------------------------------------
     // Initiates active close on both sockets (sends TCP FIN packets)
     close(client_fd);
-    close(ipv4_tcp);
+    close(server_fd);
     return 0;
 }
