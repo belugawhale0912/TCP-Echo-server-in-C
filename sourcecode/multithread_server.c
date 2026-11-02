@@ -33,6 +33,14 @@ int main(void) {
         printf("Socket created successfully! FD: %d\n", server_fd);
     }
 
+	// Allow immediate port reuse after server restart
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt(SO_REUSEADDR) failed");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
 	// Configure the server's network address structure
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
@@ -103,7 +111,7 @@ void *handle_client(void *arg){
 	// extract context allocated on heap in main function and free memory	
 	client_context_t *ctx = (client_context_t *)arg;
 	int client_fd = ctx->client_fd;
-	char client_ip[INET_ADDRSTRLEN]
+	char client_ip[INET_ADDRSTRLEN];
 	strncpy(client_ip, ctx->client_ip, INET_ADDRSTRLEN);
 	int client_port = ctx->client_port;
 	free(ctx);

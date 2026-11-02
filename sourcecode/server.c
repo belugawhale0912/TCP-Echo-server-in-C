@@ -25,6 +25,14 @@ int main(void) {
         printf("Socket created successfully! FD: %d\n", server_fd);
     }
 
+	// Allow immediate port reuse after server restart
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt(SO_REUSEADDR) failed");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
     // -------------------------------------------------------------
     // 2. Configure the server's network address structure
     // -------------------------------------------------------------
